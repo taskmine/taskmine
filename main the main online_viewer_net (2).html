@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Completion Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .task, .login-container {
+            margin-bottom: 10px;
+        }
+        .task button, .login-container button {
+            padding: 8px 15px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .task button:disabled, .login-container button:disabled {
+            background-color: #ccc;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .status span {
+            font-weight: bold;
+        }
+        .withdraw-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .withdraw-button:disabled {
+            background-color: #ccc;
+        }
+        #withdrawOptions {
+            display: none;
+            margin-top: 10px;
+        }
+        #withdrawOptions select {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        #loading {
+            display: none;
+            font-size: 16px;
+            color: #888;
+        }
+        .hidden {
+            display: none;
+        }
+        .message {
+            color: green;
+            margin-bottom: 20px;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 20px;
+        }
+        .password-container {
+            position: relative;
+            display: inline-block;
+        }
+        .password-container input[type="password"] {
+            padding-right: 30px;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 5px;
+            top: 7px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login and Signup Section -->
+    <div class="container" id="loginContainer"
+    </div>TASK & EARN 💰
+        <h1 id="loginTitle">Create an Account /Activate </h1>
+        <div class="login-container">
+            <input type="email" id="email" placeholder="Enter your email" required><br><br>
+            <div class="password-container">
+                <input type="password" id="password" placeholder="Enter your password" required>
+                <button class="password-toggle" id="togglePassword">Show</button>
+            </div><br><br>
+            <button id="submitBtn"Activate Account</button>
+            <div class="message" id="message"></div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+        <button id="loginBtn">Login</button> <!-- Always visible login button -->
+    </div>
+
+    <!-- Task Completion Section -->
+    <div class="container hidden" id="taskContainer">
+        <h1>Complete Tasks And Earn</h1>
+        withdraw $10 at the end of the week after completing the first two tasks.
+        <!-- Withdraw Button Section -->
+        <button id="withdrawBtn" class="withdraw-button">Withdraw ($0.00)</button>
+        <div id="withdrawOptions">
+            <select id="withdrawMethod">
+                <option value="">Select withdrawal method</option>
+                <option value="opay">Opay</option>
+                <option value="palmpay">PalmPay</option>
+                <option value="bank">Bank Transfer</option>
+                <option value="usdt">USDT</option>
+            </select>
+            <button id="confirmWithdrawBtn">Confirm Withdraw</button>
+        </div>
+
+        <div id="loading">Task in Progress...</div>
+
+        <!-- Tasks Section -->
+        <div class="tasks">
+            <div class="task">
+                <h2>Task 1: Subscribe to Offer</h2>
+                <button id="task1Btn">Complete Task 1</button>
+            </div>
+            <div class="task">
+                <h2>Task 2: Download Two Apps</h2>
+                <button id="task2Btn">Complete Task 2</button>
+            </div>
+
+            <div class="status">
+                Status: <span id="status"></span>
+            </div>
+
+            <!-- Task 3-50: Initially Disabled -->
+            <script>
+                for (let i = 3; i <= 50; i++) {
+                    document.write(`
+                        <div class="task">
+                            <h2>Task ${i}: Waiting!...</h2>
+                            <button id="task${i}Btn" disabled>Complete Task ${i}</button>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+
+    <script>
+        let users = {}; // Temporary store for account creation
+        let task1CompletedClicks = 0;
+        let task2CompletedClicks = 0;
+        const requiredClicks = 1500;
+
+        // Handle Account Creation
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const message = document.getElementById('message');
+            const errorMessage = document.getElementById('errorMessage');
+            message.textContent = '';
+            errorMessage.textContent = '';
+
+            if (!validateEmail(email)) {
+                errorMessage.textContent = 'Invalid email format.';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMessage.textContent = 'Password must be at least 6 characters long.';
+                return;
+            }
+
+            if (users[email]) {
+                errorMessage.textContent = 'Email already exists. Please log in.';
+            } else {
+                users[email] = password;
+                message.textContent = 'Account activated successfully. Please log in.';
+                document.getElementById('loginBtn').style.display = 'inline-block'; // Show the login button
+                document.getElementById('loginTitle').textContent = 'Login';
+            }
+        });
+
+        // Handle Login Button click
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '';
+
+            if (!validateEmail(email)) {
+                errorMessage.textContent = 'Invalid email format.';
+                return;
+            }
+
+            if (users[email] && users[email] === password) {
+                document.getElementById('loginContainer').classList.add('hidden');
+                document.getElementById('taskContainer').classList.remove('hidden');
+            } else {
+                errorMessage.textContent = 'Wrong login details. Please try again.';
+            }
+        });
+
+        // Email validation function
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('password');
+            const togglePasswordButton = document.getElementById('togglePassword');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                togglePasswordButton.textContent = 'Hide';
+            } else {
+                passwordField.type = 'password';
+                togglePasswordButton.textContent = 'Show';
+            }
+        });
+
+        function updateStatus() {
+            const totalClicks = task1CompletedClicks + task2CompletedClicks;
+            if (totalClicks >= requiredClicks) {
+                enableRemainingTasks();
+            } else {
+                document.getElementById('loading').style.display = 'block';
+            }
+        }
+
+        function enableRemainingTasks() {
+            for (let i = 3; i <= 50; i++) {
+                document.getElementById(`task${i}Btn`).disabled = false;
+            }
+        }
+
+        function showLoading() {
+            const loadingElement = document.getElementById('loading');
+            loadingElement.style.display = 'block';
+            setTimeout(() => {
+                loadingElement.style.display = 'none';
+            }, 1000);
+        }
+
+        document.getElementById('task1Btn').addEventListener('click', () => {
+            showLoading();
+            setTimeout(() => {
+                task1CompletedClicks++;
+                updateStatus();
+                window.location.href = 'https://cpmmrog.tihvpvp.com/cl/b871fba56539fa71';
+            }, 1000);
+        });
+
+        document.getElementById('task2Btn').addEventListener('click', () => {
+            showLoading();
+            setTimeout(() => {
+                task2CompletedClicks++;
+                updateStatus();
+                window.location.href = 'https://appslocked.com/cl/i/dv16nw';
+            }, 1000);
+        });
+
+        document.getElementById('withdrawBtn').addEventListener('click', () => {
+            document.getElementById('withdrawOptions').style.display = 'block';
+        });
+
+        document.getElementById('confirmWithdrawBtn').addEventListener('click', () => {
+            const selectedMethod = document.getElementById('withdrawMethod').value;
+            if (selectedMethod) {
+                alert('Error: Task has not been approved yet, your balance is still 0.00');
+            } else {
+                alert('Please select a withdrawal method.');
+            }
+        });
+    </script>
+
+</body>
+</html>
+
