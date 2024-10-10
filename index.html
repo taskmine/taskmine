@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TASK MINE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f5;
+        }
+        .container {
+            max-width: 800px;
+            width: 90%;
+            padding: 30px;
+            background: #fff;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        h1 {
+            margin-bottom: 5px;
+            font-size: 32px;
+            color: #333;
+        }
+        h2 {
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+        }
+        .login-container, .task {
+            margin-bottom: 20px;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        .green-btn {
+            background-color: #28a745;
+        }
+        .green-btn:hover {
+            background-color: #218838;
+        }
+        .blue-btn {
+            background-color: #007bff;
+        }
+        .blue-btn:hover {
+            background-color: #0056b3;
+        }
+        .gray-btn {
+            background-color: #ccc;
+            color: #333;
+            cursor: not-allowed;
+        }
+        .withdraw-button {
+            background-color: #007bff;
+            margin-top: 20px;
+        }
+        .withdraw-button:hover {
+            background-color: #0056b3;
+        }
+        .balance {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .balance-box {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            margin-bottom: 20px;
+        }
+        .withdraw-options {
+            display: none;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        .available-tasks {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login Section -->
+    <div class="container" id="loginContainer">
+        <div class="logo">🐙</div>
+        <h1 id="loginTitle">TASK MINE</h1>
+        <h2>Like an octopus with many hands, earn more by managing multiple tasks!</h2>
+        <div class="login-container">
+            <input type="email" id="email" placeholder="Enter your email" required>
+            <div class="password-container">
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+            <button id="submitBtn" class="green-btn">Activate Account</button>
+            <div class="message" id="message"></div>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+        <button id="loginBtn" class="green-btn" style="display:none;">Login</button>
+    </div>
+
+    <!-- Task Completion Section -->
+    <div class="container hidden" id="taskContainer">
+        <h1>Complete Tasks And Earn</h1>
+        <p>Withdraw $10 at the end of the week after completing the first two tasks.</p>
+
+        <div class="balance-box">
+            <div class="balance">Balance: <span id="balanceAmount">$0.00</span></div>
+        </div>
+
+        <button id="withdrawBtn" class="withdraw-button">Withdraw</button>
+        <div id="withdrawOptions" class="withdraw-options">
+            <select id="withdrawMethod">
+                <option value="">Select withdrawal method</option>
+                <option value="opay">Opay</option>
+                <option value="palmpay">PalmPay</option>
+                <option value="bank">Bank Transfer</option>
+                <option value="usdt">USDT</option>
+            </select>
+            <button id="confirmWithdrawBtn" class="green-btn hidden">Confirm Withdraw</button>
+        </div>
+
+        <div id="loading">Task in Progress...</div>
+
+        <!-- Logo and Available Tasks -->
+        <div class="logo">🐙</div>
+        <div class="available-tasks">Available Tasks</div>
+
+        <!-- Tasks Section -->
+        <div class="tasks">
+            <div class="task">
+                <h2>Task 1: Subscribe to Offer</h2>
+                <button id="task1Btn" class="blue-btn">Complete Task 1</button>
+            </div>
+            <div class="task">
+                <h2>Task 2: Download Two Apps</h2>
+                <button id="task2Btn" class="blue-btn">Complete Task 2</button>
+            </div>
+            <div class="task">
+                <h2>Task 3: Waiting!...</h2>
+                <button id="task3Btn" class="gray-btn" disabled>Complete Task 3</button>
+            </div>
+            <!-- Task 4-50: Initially Disabled -->
+            <script>
+                for (let i = 4; i <= 50; i++) {
+                    document.write(`
+                        <div class="task">
+                            <h2>Task ${i}: Waiting!...</h2>
+                            <button id="task${i}Btn" class="gray-btn" disabled>Complete Task ${i}</button>
+                        </div>
+                    `);
+                }
+            </script>
+            <div class="status">
+                Status: <span id="status"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = {}; // Temporary store for account creation
+
+        // Handle Account Creation
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const message = document.getElementById('message');
+            const errorMessage = document.getElementById('errorMessage');
+            message.textContent = '';
+            errorMessage.textContent = '';
+
+            if (!validateEmail(email)) {
+                errorMessage.textContent = 'Invalid email format.';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMessage.textContent = 'Password must be at least 6 characters long.';
+                return;
+            }
+
+            if (users[email]) {
+                errorMessage.textContent = 'Email already exists. Please log in.';
+            } else {
+                users[email] = password;
+                message.textContent = 'Account activated successfully. Please log in.';
+                document.getElementById('loginBtn').style.display = 'inline-block'; // Show the login button
+                document.getElementById('loginTitle').textContent = 'Login';
+            }
+        });
+
+        // Handle Login Button click
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '';
+
+            if (!validateEmail(email)) {
+                errorMessage.textContent = 'Invalid email format.';
+                return;
+            }
+
+            if (users[email] && users[email] === password) {
+                document.getElementById('loginContainer').classList.add('hidden');
+                document.getElementById('taskContainer').classList.remove('hidden');
+            } else {
+                errorMessage.textContent = 'Invalid email or password.';
+            }
+        });
+
+        // Email validation function
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(String(email).toLowerCase());
+        }
+
+        // Task Completion Logic
+        document.getElementById('task1Btn').addEventListener('click', function() {
+            // Redirect directly to the URL without counting clicks
+            window.location.href = 'https://cpmmrog.tihvpvp.com/cl/b871fba56539fa71';
+        });
+
+        document.getElementById('task2Btn').addEventListener('click', function() {
+            // Redirect directly to the URL without counting clicks
+            window.location.href = 'https://appslocked.com/cl/i/dv16nw';
+        });
+
+        // Withdraw functionality
+        document.getElementById('withdrawBtn').addEventListener('click', function() {
+            const withdrawOptions = document.getElementById('withdrawOptions');
+            withdrawOptions.style.display = 'block';
+            this.style.display = 'none'; // Hide the withdraw button after it's clicked
+            document.getElementById('confirmWithdrawBtn').classList.remove('hidden'); // Show confirm withdraw button
+        });
+
+        document.getElementById('confirmWithdrawBtn').addEventListener('click', function() {
+            const withdrawMethod = document.getElementById('withdrawMethod').value;
+            if (withdrawMethod) {
+                alert('Error: Task has not been approved yet, your balance is still $0.00');
+            } else {
+                alert('Please select a withdrawal method.');
+            }
+        });
+    </script>
+
+</body>
+</html>
